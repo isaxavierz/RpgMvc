@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RpgMvc.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using RpgMvc.Models;
+using Newtonsoft.Json;
+
 
 namespace RpgMvc.Controllers
 {
@@ -101,7 +101,7 @@ namespace RpgMvc.Controllers
            try
            {
                 HttpClient httpClient = new HttpClient();
-                string token = HttpContext.Session.GetString("SessinTokenUsuario");
+                string token = HttpContext.Session.GetString("SessionTokenUsuario");
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 HttpResponseMessage response = await httpClient.GetAsync(uriBase + id.ToString());
@@ -109,8 +109,100 @@ namespace RpgMvc.Controllers
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    PersonagemViewModel p = await Task.Run(() => JsonConvert.DeserializeObject<List<PersonagemViewModel>>(serialized));
+                    PersonagemViewModel p = await Task.Run(() => JsonConvert.DeserializeObject<PersonagemViewModel>(serialized));
                     return View(p);
+                }
+                else
+                    throw new System.Exception(serialized);
+
+            }
+            catch(System.Exception ex)
+            {
+                TempData["MensagemErro"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+        
+        }
+
+          [HttpGet]
+        public  async Task<IActionResult> EditAsync(int? id)
+        {
+           try
+           {
+                HttpClient httpClient = new HttpClient();
+                string token = HttpContext.Session.GetString("SessionTokenUsuario");
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                HttpResponseMessage response = await httpClient.GetAsync(uriBase + id.ToString());
+                string serialized = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    PersonagemViewModel p = await Task.Run(() => JsonConvert.DeserializeObject<PersonagemViewModel>(serialized));
+                    return View(p);
+                }
+                else
+                    throw new System.Exception(serialized);
+
+            }
+            catch(System.Exception ex)
+            {
+                TempData["MensagemErro"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+        
+        }
+
+           [HttpPost]
+        public  async Task<IActionResult> EditAsync(PersonagemViewModel p)
+        {
+           try
+           {
+                HttpClient httpClient = new HttpClient();
+                string token = HttpContext.Session.GetString("SessionTokenUsuario");
+                
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var content = new StringContent(JsonConvert.SerializeObject(p));
+                content.Headers.ContentType = new MediaTypeHeaderValue("aplication/json");
+
+                HttpResponseMessage response = await httpClient.PutAsync(uriBase , content);
+                string serialized = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                   TempData["Mensagem"] = String.Format("Personagem {0}, Classe {1} atualizado com sucesso!", p.Nome, p.Classe);
+                    return RedirectToAction("Index");
+                }
+                else
+                    throw new System.Exception(serialized);
+
+            }
+            catch(System.Exception ex)
+            {
+                TempData["MensagemErro"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+        
+        }
+
+            [HttpGet]
+        public  async Task<IActionResult> DeleteAsync(int id)
+        {
+           try
+           {
+                HttpClient httpClient = new HttpClient();
+                string token = HttpContext.Session.GetString("SessionTokenUsuario");
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                HttpResponseMessage response = await httpClient.DeleteAsync(uriBase + id.ToString());
+                string serialized = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                     TempData["Mensagem"] = String.Format("Personagem Id {0} removido com sucesso!", id);
+                    return RedirectToAction("Index");
                 }
                 else
                     throw new System.Exception(serialized);

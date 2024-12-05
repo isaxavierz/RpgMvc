@@ -34,3 +34,4 @@ D:\IsaDS\RpgMvc\obj\Debug\net8.0\refint\RpgMvc.dll
 D:\IsaDS\RpgMvc\obj\Debug\net8.0\RpgMvc.pdb
 D:\IsaDS\RpgMvc\obj\Debug\net8.0\RpgMvc.genruntimeconfig.cache
 D:\IsaDS\RpgMvc\obj\Debug\net8.0\ref\RpgMvc.dll
+D:\IsaDS\RpgMvc\obj\Debug\net8.0\RpgMvc.sourcelink.json
